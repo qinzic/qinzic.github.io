@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+    <title>Chap7 Demo 2 Textured Cube</title>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+#version 300 es
+in vec4 vPosition;
+in vec3 vNormal;
+
+out vec3 vReflectDir;
+
+uniform vec3 theta;
+uniform vec3 cameraPosition;
+
+void main()
+{
+    vec3 angles = radians( theta );
+    vec3 c = cos( angles );
+    vec3 s = sin( angles );
+
+    mat4 rx = mat4( 1.0,  0.0,  0.0, 0.0,
+                    0.0,  c.x,  s.x, 0.0,
+                    0.0, -s.x,  c.x, 0.0,
+                    0.0,  0.0,  0.0, 1.0 );
+    mat4 ry = mat4( c.y,  0.0, -s.y, 0.0,
+                    0.0,  1.0,  0.0, 0.0,
+                    s.y,  0.0,  c.y, 0.0,
+                    0.0,  0.0,  0.0, 1.0 );
+    mat4 rz = mat4( c.z,  s.z, 0.0, 0.0,
+                    -s.z,  c.z, 0.0, 0.0,
+                        0.0,  0.0, 1.0, 0.0,
+                        0.0,  0.0, 0.0, 1.0 );
+
+    mat4 modelMatrix = rz * ry * rx;
+    vec4 worldPos = modelMatrix * vPosition;
+
+    vec3 worldNormal = normalize(mat3(modelMatrix) * vNormal);
+
+    vec3 viewDir = normalize(worldPos.xyz - cameraPosition);
+
+    vReflectDir = reflect(viewDir, worldNormal);
+
+    gl_Position = worldPos;
+    gl_Position.z = -gl_Position.z;
+}
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+#version 300 es
+precision mediump float;
+
+in vec3 vReflectDir;
+out vec4 fColor;
+
+uniform samplerCube u_skybox;
+
+void main()
+{
+    fColor = texture(u_skybox, vReflectDir);
+}
+    </script>
+
+    <script type="text/javascript" src="../js/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../js/common/initShaders.js"></script>
+    <script type="text/javascript" src="../js/common/gl-matrix-min.js"></script>
+
+    <script type="text/javascript" src="../js/ch07/textureCubeCheck.js"></script>
+</head>
+
+<body>
+    <h1>带纹理的立方体</h1>
+    <canvas id="gl-canvas" width="600" height="600">
+        你的浏览器不支持HTML5 canvas元素
+    </canvas>
+
+    <div class="controls">
+        <button id="ButtonX">Switch Camera Position</button>
+        <button id="ButtonY">Rotate Y</button>
+        <button id="ButtonZ">Rotate Z</button>
+    </div>
+
+    <div class="controls">
+        <h3>天空盒纹理选择</h3>
+        <input type="file" id="skybox-px" accept="image/*" placeholder="右面(+X)">
+        <input type="file" id="skybox-nx" accept="image/*" placeholder="左面(-X)">
+        <input type="file" id="skybox-py" accept="image/*" placeholder="上面(+Y)">
+        <input type="file" id="skybox-ny" accept="image/*" placeholder="下面(-Y)">
+        <input type="file" id="skybox-pz" accept="image/*" placeholder="前面(+Z)">
+        <input type="file" id="skybox-nz" accept="image/*" placeholder="后面(-Z)">
+    </div>
+</body>
+</html>

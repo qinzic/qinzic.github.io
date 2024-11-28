@@ -1,0 +1,58 @@
+#version 300 es
+precision mediump float;
+
+in vec2 fTexCoord;
+in vec3 fNormal;
+in vec3 fLight;
+in vec3 fView;
+in vec3 fReflect;
+
+uniform sampler2D objectTexture;  // 物体纹理
+uniform samplerCube skyboxTexture; // 天空盒纹理
+uniform int textureBlendMode;     // 纹理混合模式
+uniform vec4 materialColor;        // 物体颜色
+
+uniform vec4 ambientProduct;
+uniform vec4 diffuseProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+
+out vec4 fragColor;
+
+void main() {
+    // 基础光照计算
+    vec3 N = normalize(fNormal);
+    vec3 L = normalize(fLight);
+    vec3 V = normalize(fView);
+    vec3 H = normalize(L + V);
+    
+    float Kd = max(dot(L, N), 0.0);
+    float Ks = pow(max(dot(N, H), 0.0), shininess);
+    
+    vec4 ambient = ambientProduct;
+    vec4 diffuse = Kd * diffuseProduct;
+    vec4 specular = Ks * specularProduct;
+    
+    // 获取物体纹理颜色
+    vec4 texColor = texture(objectTexture, fTexCoord);
+    
+    // 获取环境映射颜色
+    vec4 envColor = texture(skyboxTexture, fReflect);
+    
+    // 根据混合模式计算最终颜色
+    vec4 finalColor;
+    if(textureBlendMode == 1) {
+        // 替换模式
+        finalColor = texColor;
+    } else {
+        // 混合模式
+        finalColor = mix(texColor, materialColor, 0.5);
+    }
+    
+    // 添加环境映射效果
+    finalColor = mix(finalColor, envColor, 0.3);
+    
+    // 应用光照
+    fragColor = finalColor * (ambient + diffuse + specular);
+    fragColor.a = 1.0;
+} 
