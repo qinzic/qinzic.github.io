@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        #version 300 es
+		
+		in vec4 vPosition;
+        in vec4 vColor;
+        out vec4 aColor;
+
+        uniform mat4 modelViewMatrix;
+        uniform mat4 projectionMatrix;
+
+        void main(){
+            gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+            aColor = vColor;
+        }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        #version 300 es
+		precision mediump float;
+		
+		in vec4 aColor;
+        out vec4 fColor;
+        void main(){
+            fColor = aColor;
+        }
+    </script>
+
+    <script type="text/javascript" src="../js/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../js/common/initShaders.js"></script>
+    <script type="text/javascript" src="../js/common/gl-matrix-min.js"></script>
+    <script type="text/javascript" src="../js/common/objloader.js"></script>
+    <script type="text/javascript" src="../js/ch05/complexobjview.js"></script>
+</head>
+<body onload="initWindow()">
+    <h1>3D Model Viewer</h1>
+    
+    <canvas id="gl-canvas" width="512" height="512">
+        Your browser doesn't support HTML5 Canvas
+    </canvas>
+
+    <!-- File Input -->
+    <div>
+        <input type="file" id="fileInput" accept=".obj">
+    </div>
+
+    <!-- Projection Controls -->
+    <div>
+        <input type="radio" id="ortho" name="projtype" value="1" checked>
+        <label for="ortho">Orthographic</label>
+        <input type="radio" id="persp" name="projtype" value="2">
+        <label for="persp">Perspective</label>
+    </div>
+
+    <!-- Drawing Mode -->
+    <div>
+        <input type="radio" id="wire" name="drawtype" value="1" checked>
+        <label for="wire">Wireframe</label>
+        <input type="radio" id="solid" name="drawtype" value="2">
+        <label for="solid">Solid</label>
+        <input type="color" id="objcolor" value="#1f1f1f">
+    </div>
+
+    <!-- Transform Controls -->
+    <div>
+        <input type="radio" id="obj" name="posgrp" value="1" checked>
+        <label for="obj">Object</label>
+        <input type="radio" id="cam" name="posgrp" value="2">
+        <label for="cam">Camera</label>
+    </div>
+
+    <!-- Position Controls -->
+    <div>
+        <label>X: <input type="range" id="xpos" min="-5" max="5" step="0.1" value="0"></label>
+        <label>Y: <input type="range" id="ypos" min="-5" max="5" step="0.1" value="0"></label>
+        <label>Z: <input type="range" id="zpos" min="-5" max="5" step="0.1" value="0"></label>
+    </div>
+
+    <!-- Rotation Controls -->
+    <div>
+        <label>X-Rot: <input type="range" id="xrot" min="-180" max="180" step="1" value="0"></label>
+        <label>Y-Rot: <input type="range" id="yrot" min="-180" max="180" step="1" value="0"></label>
+        <label>Z-Rot: <input type="range" id="zrot" min="-180" max="180" step="1" value="0"></label>
+    </div>
+</body>
+</html>
