@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>幻想星系</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://threejs.org/build/three.module.min.js",
+            "three/addons/": "https://threejs.org/examples/jsm/",
+            "three/examples/jsm/": "https://threejs.org/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="box"></div>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+        import Stats from 'three/examples/jsm/libs/stats.module.js';
+        import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+        // 在 params 对象中添加行星材质配置
+        const params = {
+            particleCount: 350000,
+            particleSize: 0.015,
+            branches: 5,
+            branchRadius: 7,
+            spin: 0.3,
+            radialRandomness: 0.4,
+            innerColor: '#ff6b3d',
+            outerColor: '#8a4fff',
+            asteroidCount: 50,
+            asteroidSize: 0.3,
+            asteroidSpeed: 0.0001,
+            asteroidOrbitRadius: 12,
+            asteroidColor: '#d4d4ff',
+            galaxyOpacity: 0.8,
+            asteroidOpacity: 1.0,
+            rotationSpeed: 0.0008,
+            asteroidSpread: 1.5,
+            colorSchemes: {
+                default: { inner: '#ff6b3d', outer: '#8a4fff' },
+                fire: { inner: '#ff4400', outer: '#ff8800' },
+                ice: { inner: '#00ffff', outer: '#0044ff' },
+                nature: { inner: '#00ff44', outer: '#88ff00' },
+                cosmic: { inner: '#ff00ff', outer: '#0000ff' }
+            },
+            selectedScheme: 'default',
+            colorIntensity: 1.0,
+            colorSaturation: 1.0,
+            glowIntensity: 1.0,
+            colorBlend: 0.5,
+            
+            // 行星材质配置
+            planetMaterials: {
+                mercury: {
+                    color: '#A0522D',
+                    name: '水星',
+                    shininess: 40,
+                    specular: 0x666666,
+                    roughness: 0.8,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mercury.jpg',
+                    bumpMapUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mercury_bump.jpg',
+                    bumpScale: 0.02
+                },
+                venus: {
+                    color: '#DEB887',
+                    name: '金星',
+                    shininess: 30,
+                    specular: 0x555555,
+                    roughness: 0.7,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/venus_surface.jpg',
+                    bumpScale: 0.05
+                },
+                earth: {
+                    color: '#4169E1',
+                    name: '地球',
+                    shininess: 50,
+                    specular: 0x777777,
+                    roughness: 0.5,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+                    normalMapUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg',
+                    specularMapUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg',
+                    bumpScale: 0.05
+                },
+                mars: {
+                    color: '#CD5C5C',
+                    name: '火星',
+                    shininess: 35,
+                    specular: 0x444444,
+                    roughness: 0.9,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mars.jpg',
+                    bumpMapUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/mars_bump.jpg',
+                    bumpScale: 0.08
+                },
+                jupiter: {
+                    color: '#DAA520',
+                    name: '木星',
+                    shininess: 45,
+                    specular: 0x888888,
+                    roughness: 0.4,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/jupiter.jpg',
+                    bumpScale: 0.02
+                },
+                saturn: {
+                    color: '#F4A460',
+                    name: '土星',
+                    shininess: 55,
+                    specular: 0x999999,
+                    roughness: 0.3,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/saturn.jpg',
+                    bumpScale: 0.02
+                },
+                uranus: {
+                    color: '#87CEEB',
+                    name: '天王星',
+                    shininess: 60,
+                    specular: 0xaaaaaa,
+                    roughness: 0.2,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/uranus.jpg',
+                    bumpScale: 0.02
+                },
+                neptune: {
+                    color: '#4682B4',
+                    name: '海王星',
+                    shininess: 65,
+                    specular: 0xbbbbbb,
+                    roughness: 0.1,
+                    textureUrl: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/neptune.jpg',
+                    bumpScale: 0.02
+                }
+            }
+        };
+
+        // 修改 AsteroidSystem 类的定义
+        class AsteroidSystem {
+            constructor(scene, params) {
+                this.scene = scene;
+                this.params = params;
+                this.sphereGroup = new THREE.Group();
+                this.scene.add(this.sphereGroup);
+                this.sphereRadius = this.params.branchRadius / 20;
+                this.currentCount = 0;
+                this.textureLoader = new THREE.TextureLoader();
+                this.loadedTextures = new Map();
+            }
+
+            // 添加加载纹理的方法
+            async loadTexture(url) {
+                if (!this.loadedTextures.has(url)) {
+                    const texture = await this.textureLoader.loadAsync(url);
+                    texture.encoding = THREE.sRGBEncoding;
+                    this.loadedTextures.set(url, texture);
+                }
+                return this.loadedTextures.get(url);
+            }
+
+            // 修改创建球体材质的方法
+            async createPlanetMaterial(planetMaterial) {
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: new THREE.Color(planetMaterial.color),
+                    transparent: true,
+                    opacity: this.params.asteroidOpacity,
+                    metalness: 0.1,
+                    roughness: planetMaterial.roughness,
+                    envMapIntensity: 1,
+                    clearcoat: 0.3,
+                    clearcoatRoughness: 0.4,
+                    normalScale: new THREE.Vector2(1, 1),
+                    bumpScale: planetMaterial.bumpScale || 0.02
+                });
+
+                // 加载基础纹理
+                if (planetMaterial.textureUrl) {
+                    const texture = await this.loadTexture(planetMaterial.textureUrl);
+                    material.map = texture;
+                }
+
+                // 加载法线贴图
+                if (planetMaterial.normalMapUrl) {
+                    const normalMap = await this.loadTexture(planetMaterial.normalMapUrl);
+                    material.normalMap = normalMap;
+                }
+
+                // 加载凹凸贴图
+                if (planetMaterial.bumpMapUrl) {
+                    const bumpMap = await this.loadTexture(planetMaterial.bumpMapUrl);
+                    material.bumpMap = bumpMap;
+                }
+
+                // 加载高光贴图
+                if (planetMaterial.specularMapUrl) {
+                    const specularMap = await this.loadTexture(planetMaterial.specularMapUrl);
+                    material.specularMap = specularMap;
+                }
+
+                return material;
+            }
+
+            // 修改生成方法
+            async generate() {
+                if (this.asteroids) {
+                    this.scene.remove(this.sphereGroup);
+                    this.sphereGroup = new THREE.Group();
+                    this.scene.add(this.sphereGroup);
+                }
+
+                const planetTypes = Object.values(this.params.planetMaterials);
+
+                // 添加基础材质
+                const baseMaterial = new THREE.MeshPhongMaterial({
+                    color: 0xffffff,
+                    shininess: 50,
+                    specular: 0x444444
+                });
+
+                for (let i = 0; i < this.params.asteroidCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const tilt = (Math.random() - 0.5) * this.params.asteroidSpread;
+                    const radius = this.params.asteroidOrbitRadius + 
+                                 (Math.random() - 0.5) * this.params.asteroidSpread * 2;
+
+                    const planetMaterial = planetTypes[Math.floor(Math.random() * planetTypes.length)];
+                    
+                    // 创建基础材质的克隆
+                    const material = baseMaterial.clone();
+                    material.color.set(planetMaterial.color);
+                    material.transparent = true;
+                    material.opacity = this.params.asteroidOpacity;
+
+                    const sphereGeometry = new THREE.SphereGeometry(
+                        this.sphereRadius * (0.5 + Math.random() * 0.5),
+                        32,
+                        32
+                    );
+
+                    const sphere = new THREE.Mesh(sphereGeometry, material);
+
+                    // 设置球体初始位置
+                    sphere.position.x = Math.cos(angle) * radius;
+                    sphere.position.y = Math.sin(tilt) * radius * 0.3;
+                    sphere.position.z = Math.sin(angle) * radius;
+
+                    // 存储球体的运动参数
+                    sphere.userData.orbit = {
+                        angle,
+                        radius,
+                        tilt,
+                        speed: this.params.asteroidSpeed * (1 / (radius * 0.5)),
+                        verticalSpeed: Math.random() * 0.001,
+                        planetType: planetMaterial.name
+                    };
+
+                    this.sphereGroup.add(sphere);
+                }
+
+                // 添加光照
+                if (!this.scene.getObjectByName('asteroidLight')) {
+                    // 环境光
+                    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+                    ambientLight.name = 'asteroidLight';
+                    this.scene.add(ambientLight);
+
+                    // 主光源
+                    const mainLight = new THREE.PointLight(0xffffff, 1.5);
+                    mainLight.position.set(10, 10, 10);
+                    mainLight.name = 'asteroidMainLight';
+                    this.scene.add(mainLight);
+
+                    // 补光
+                    const fillLight = new THREE.PointLight(0x404040, 0.8);
+                    fillLight.position.set(-10, -10, -10);
+                    fillLight.name = 'asteroidFillLight';
+                    this.scene.add(fillLight);
+
+                    // 轮廓光
+                    const rimLight = new THREE.DirectionalLight(0xffffff, 0.5);
+                    rimLight.position.set(0, 5, -10);
+                    rimLight.name = 'asteroidRimLight';
+                    this.scene.add(rimLight);
+                }
+            }
+
+            update() {
+                if (!this.sphereGroup) return;
+
+                this.sphereGroup.children.forEach(sphere => {
+                    const orbit = sphere.userData.orbit;
+                    
+                    // 更新位置
+                    orbit.angle += orbit.speed * this.params.asteroidSpeed;
+                    
+                    sphere.position.x = Math.cos(orbit.angle) * orbit.radius;
+                    sphere.position.z = Math.sin(orbit.angle) * orbit.radius;
+                    
+                    // 使用存储的tilt值来保持垂直位置
+                    if (orbit.tilt) {
+                        sphere.position.y = Math.sin(orbit.tilt) * orbit.radius * 0.3 + 
+                                          Math.sin(Date.now() * orbit.verticalSpeed) * 0.01;
+                    }
+                    
+                    // 添加自转
+                    sphere.rotation.x += 0.01;
+                    sphere.rotation.y += 0.01;
+                });
+            }
+
+            updateSize(size) {
+                this.sphereRadius = size * this.params.branchRadius / 20;
+                // 更新现有球体的大小，而不是重新生成
+                this.sphereGroup.children.forEach(sphere => {
+                    const scale = 0.5 + Math.random() * 0.5; // 保持随机大小变化
+                    sphere.scale.set(size, size, size);
+                });
+            }
+
+            updateOpacity(opacity) {
+                this.sphereGroup.children.forEach(sphere => {
+                    sphere.material.opacity = opacity;
+                });
+            }
+
+            updateSpeed(speed) {
+                this.params.asteroidSpeed = speed;
+                // 更新现有球体的速度，而不是重新生成
+                this.sphereGroup.children.forEach(sphere => {
+                    const orbit = sphere.userData.orbit;
+                    orbit.speed = speed * (1 / (orbit.radius * 0.5));
+                });
+            }
+
+            updateOrbitRadius(radius) {
+                this.params.asteroidOrbitRadius = radius;
+                this.generate();
+            }
+
+            updateSpread(spread) {
+                this.params.asteroidSpread = spread;
+                // 更新现有球体的分布，而不是重新生成
+                this.sphereGroup.children.forEach(sphere => {
+                    const orbit = sphere.userData.orbit;
+                    const tilt = (Math.random() - 0.5) * spread;
+                    const radius = this.params.asteroidOrbitRadius + 
+                                 (Math.random() - 0.5) * spread * 2;
+                    
+                    // 更新轨道参数
+                    orbit.radius = radius;
+                    orbit.tilt = tilt;
+                    
+                    // 更新位置
+                    sphere.position.y = Math.sin(tilt) * radius * 0.3;
+                });
+            }
+
+            updateCount(newCount) {
+                newCount = Math.floor(newCount);
+                
+                // 如果新数量小于当前数量，删除多余的球体
+                while (this.sphereGroup.children.length > newCount) {
+                    const lastSphere = this.sphereGroup.children[this.sphereGroup.children.length - 1];
+                    this.sphereGroup.remove(lastSphere);
+                    lastSphere.geometry.dispose();
+                    lastSphere.material.dispose();
+                }
+                
+                // 如果新数量大于当前数量，添加新的球体
+                const planetTypes = Object.values(this.params.planetMaterials);
+                while (this.sphereGroup.children.length < newCount) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const tilt = (Math.random() - 0.5) * this.params.asteroidSpread;
+                    const radius = this.params.asteroidOrbitRadius + 
+                                 (Math.random() - 0.5) * this.params.asteroidSpread * 2;
+
+                    // 随机选择一个行星类型
+                    const planetMaterial = planetTypes[Math.floor(Math.random() * planetTypes.length)];
+
+                    // 创建球体材质
+                    const sphereMaterial = new THREE.MeshPhysicalMaterial({
+                        color: new THREE.Color(planetMaterial.color),
+                        transparent: true,
+                        opacity: this.params.asteroidOpacity,
+                        metalness: 0.1,
+                        roughness: planetMaterial.roughness,
+                        shininess: planetMaterial.shininess,
+                        specular: new THREE.Color(planetMaterial.specular),
+                        envMapIntensity: 1,
+                        clearcoat: 0.1,
+                        clearcoatRoughness: 0.4
+                    });
+
+                    // 创建球体几何体
+                    const sphereGeometry = new THREE.SphereGeometry(
+                        this.sphereRadius * (0.5 + Math.random() * 0.5),
+                        32,
+                        32
+                    );
+
+                    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+
+                    // 设置体初始位置
+                    sphere.position.x = Math.cos(angle) * radius;
+                    sphere.position.y = Math.sin(tilt) * radius * 0.3;
+                    sphere.position.z = Math.sin(angle) * radius;
+
+                    // 存储球体的运动参数
+                    sphere.userData.orbit = {
+                        angle,
+                        radius,
+                        tilt,
+                        speed: this.params.asteroidSpeed * (1 / (radius * 0.5)),
+                        verticalSpeed: Math.random() * 0.001,
+                        planetType: planetMaterial.name
+                    };
+
+                    this.sphereGroup.add(sphere);
+                }
+                
+                this.currentCount = newCount;
+                this.params.asteroidCount = newCount;
+            }
+        }
+
+        const initializeScene = ({ root, antialias = true } = {}) => {
+            // Create scene
+            const scene = new THREE.Scene();
+
+            // Create camera
+            const camera = new THREE.PerspectiveCamera(
+                35,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000,
+            );
+            camera.position.z = 110;
+
+            // Create renderer
+            const renderer = new THREE.WebGLRenderer({ antialias });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            root.appendChild(renderer.domElement);
+
+            const onWindowResize = () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                controls.update();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.render(scene, camera);
+            };
+            onWindowResize();
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Create GUI
+            const gui = new GUI({ container: root });
+
+            const stats = new Stats();
+            stats.showPanel(0);
+            root.appendChild(stats.domElement);
+
+            return {
+                scene,
+                renderer,
+                camera,
+                controls,
+                gui,
+                stats,
+            };
+        }
+
+        const getRandomPolarCoordinate = (radius) => {
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.random() * Math.PI * 2;
+            const x = radius * Math.sin(theta) * Math.cos(phi);
+            const y = radius * Math.sin(theta) * Math.sin(phi);
+            const z = radius * Math.cos(theta);
+            return { x, y, z };
+        }
+
+        const initGUI = (gui, generateGalaxy, material, asteroidSystem) => {
+            gui.width = 360;
+            
+            // 创建面板
+            const galaxyFolder = gui.addFolder('星系设置');
+            const colorFolder = gui.addFolder('颜色设置');
+
+            // 星系设置
+            galaxyFolder.add(params, 'particleCount', 5000, 500000, 100)
+                .name('粒子数量')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'particleSize', 0.005, 0.15)
+                .name('粒子大小')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'branches', 2, 15, 1)
+                .name('分支数量')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'branchRadius', 1, 10)
+                .name('分支半径')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'spin', -1, 1)
+                .name('旋转程度')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'radialRandomness', 0, 1)
+                .name('随机分布')
+                .onFinishChange(generateGalaxy);
+            galaxyFolder.add(params, 'galaxyOpacity', 0, 1)
+                .name('星系透明度')
+                .onFinishChange(generateGalaxy);
+
+            // 颜色设置
+            colorFolder.addColor(params, 'innerColor')
+                .name('内部颜色')
+                .onChange(generateGalaxy);
+            colorFolder.addColor(params, 'outerColor')
+                .name('外部颜色')
+                .onChange(generateGalaxy);
+            colorFolder.add(params, 'colorIntensity', 0.1, 2.0)
+                .name('颜色强度')
+                .onChange(generateGalaxy);
+            colorFolder.add(params, 'colorSaturation', 0.0, 3.0)
+                .name('饱和度')
+                .onChange(generateGalaxy);
+            colorFolder.add(params, 'glowIntensity', 0.1, 1.0)
+                .name('发光强度')
+                .onChange(() => material && (material.opacity = params.glowIntensity));
+            colorFolder.add(params, 'selectedScheme', 
+                ['default', 'fire', 'ice', 'nature', 'cosmic']
+            ).name('预设配色')
+            .onChange(() => {
+                const scheme = params.colorSchemes[params.selectedScheme];
+                params.innerColor = scheme.inner;
+                params.outerColor = scheme.outer;
+                generateGalaxy();
+            });
+
+            // 默认展开面板
+            galaxyFolder.open();
+            colorFolder.open();
+        };
+
+        const init = (root) => {
+            const { scene, renderer, camera, gui, stats, controls } = initializeScene({
+                root,
+            });
+
+            camera.position.set(7, 4, 7);
+            controls.update();
+
+            let spinDirection = 1;
+            let material = null;
+            let geometry = null;
+            let points = null;
+            let asteroidSystem;
+
+            const particleTexture = new THREE.TextureLoader().load('https://file.threehub.cn/threeExamples/shader/star.png');
+
+            // 定义 generateGalaxy 函数
+            const generateGalaxy = () => {
+                if (points) {
+                    geometry.dispose();
+                    material.dispose();
+                    scene.remove(points);
+                }
+
+                const positions = new Float32Array(params.particleCount * 3);
+                const colors = new Float32Array(params.particleCount * 3);
+                
+                // 修改颜色处理逻辑
+                const innerColor = new THREE.Color(params.innerColor);
+                const outerColor = new THREE.Color(params.outerColor);
+                
+                // 调整饱和度的函数
+                const adjustSaturation = (color, saturation) => {
+                    const hsl = {};
+                    color.getHSL(hsl);
+                    const newSaturation = Math.max(0, Math.min(1, hsl.s * saturation));
+                    color.setHSL(hsl.h, newSaturation, hsl.l);
+                    return color;
+                };
+
+                // 先调整饱和度
+                const adjustedInnerColor = adjustSaturation(innerColor.clone(), params.colorSaturation);
+                const adjustedOuterColor = adjustSaturation(outerColor.clone(), params.colorSaturation);
+
+                // 然后应用颜色强度
+                adjustedInnerColor.multiplyScalar(params.colorIntensity);
+                adjustedOuterColor.multiplyScalar(params.colorIntensity);
+
+                // 生成粒子
+                for (let i = 0; i < params.particleCount; i++) {
+                    const i3 = i * 3;
+
+                    const radius = params.branchRadius * Math.random();
+                    const branchAngle = ((i % params.branches) / params.branches) * Math.PI * 2;
+                    const spinAngle = params.spin * radius * Math.PI * 2;
+
+                    const randRadius = Math.random() * params.radialRandomness * radius;
+                    const { x: randX, y: randY, z: randZ } = getRandomPolarCoordinate(randRadius);
+
+                    positions[i3] = radius * Math.cos(branchAngle + spinAngle) + randX;
+                    positions[i3 + 1] = randY;
+                    positions[i3 + 2] = radius * Math.sin(branchAngle + spinAngle) + randZ;
+
+                    const mixedColor = adjustedInnerColor.clone().lerp(adjustedOuterColor, radius / params.branchRadius);
+                    colors[i3] = mixedColor.r;
+                    colors[i3 + 1] = mixedColor.g;
+                    colors[i3 + 2] = mixedColor.b;
+                }
+
+                material = new THREE.PointsMaterial({
+                    size: params.particleSize,
+                    sizeAttenuation: true,
+                    depthWrite: false,
+                    blending: THREE.AdditiveBlending,
+                    vertexColors: true,
+                    transparent: true,
+                    opacity: params.galaxyOpacity,
+                    alphaMap: particleTexture
+                });
+                
+                geometry = new THREE.BufferGeometry();
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+                points = new THREE.Points(geometry, material);
+                scene.add(points);
+
+                spinDirection = params.spin > 0 ? 1 : -1;
+            };
+
+            // 生成星系
+            generateGalaxy();
+            
+            // 初始化小行星系统
+            asteroidSystem = new AsteroidSystem(scene, params);
+            asteroidSystem.generate();
+
+            // 初始化 GUI
+            initGUI(gui, generateGalaxy, material, asteroidSystem);
+
+            const tick = () => {
+                requestAnimationFrame(tick);
+                stats.begin();
+
+                controls.update();
+
+                // 更新星系
+                if (geometry) {
+                    geometry.rotateY(params.rotationSpeed * spinDirection);
+                }
+
+                // 更新小行星
+                if (asteroidSystem) {
+                    asteroidSystem.update();
+                }
+
+                stats.end();
+                renderer.render(scene, camera);
+            };
+
+            tick();
+        };
+
+        // 启动程序
+        init(document.getElementById('box'));
+
+        /**
+         * 名称: 星系
+        */
+    </script>
+</body>
+</html> 
