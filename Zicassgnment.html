@@ -1,204 +1,303 @@
 <!DOCTYPE html>
-<html>
-	<head><meta name="renderer" content="webkit" />
-		<meta charset="utf-8">
-		<title></title>
-		
-<script>
-var __vpn_hostname_data = "wvpn.zcmu.edu.cn";
-var __vpn_protocol_data = "https";
-var __vpn_protocol_host = "https://wvpn.zcmu.edu.cn";
-var __vpn_app_hostname_data = "77726476706e69737468656265737421a1ae13d27666301e2751c7fec806";
-var __vpn_app_protocol_data = "http";
-var __vpn_app_port_data = "";
-var __vpn_js_file = "/wengine-vpn/js/main.js?ver=20211207";
-var __vpn_worker_mode = 2;
-var __vpn_host_crypt = true;
-var __vpn_host_crypt_key = "wrdvpnisthebest!";
-var __vpn_host_crypt_iv = "wrdvpnisthebest!";
-</script>
-<script src="/wengine-vpn/js/main.js?ver=20211207" charset="utf-8"></script> <base target="_blank">
-		<style type="text/css">
-			a {
-				text-decoration: none;
-			}
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>计算机图形学实验作业</title>
+    
+    <script src="/wengine-vpn/js/main.js?ver=20211207" charset="utf-8"></script>
+    
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-			#div3 {
-				margin: 0;
-				clear: left;
-				overflow: hidden;
-			}
+        body {
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            color: #1d1d1f;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+        }
 
-			.div3 {
-				float: left;
-				width: 65px;
-				line-height: 36px;
-				margin-right: 10px;
-				margin-bottom: 10px;
-				font-size: 16px;
-				background-color: #e5e5f3;
-				border-radius: 4px;
-				text-align: center;
-				cursor: pointer;
+        .container {
+            margin: 0 auto;
+            max-width: 1000px;
+            padding: 40px 20px;
+            animation: fadeIn 1s ease-out;
+        }
 
-			}
+        /* Header Styles */
+        .header {
+            font-size: 52px;
+            margin: 40px 0 60px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.02em;
+            color: #1d1d1f;
+            background: linear-gradient(135deg, #1d1d1f 0%, #434343 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
 
+        .header::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #007AFF, #5856D6);
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
 
-			#div1 img {
-				float: left;
-				border: solid 1px #666666;
-				width: 400px;
-				height: 350px;
-			}
+        /* Main Content Styles */
+        .profile-image {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+            border-radius: 24px;
+            margin: 0 auto 60px;
+            display: block;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
 
-			#sum img {
-				width: 150px;
-				height: 200px;
-			}
+        .profile-image:hover {
+            transform: translateY(-5px);
+        }
 
-			#con img {
-				width: 300px;
-				height: 200px;
-			}
-		</style>
-	</head>
-	<body bgcolor="pink">
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+            color: #1d1d1f;
+        }
 
-		<div style="margin:0 auto; width:700px;">
-			<div style="font-size: 40px;margin-top: 10px;margin-bottom: 10px;border-bottom: 5px solid lightcoral;padding-bottom: 10px;font-family: 黑体;">
-				<b>计算机图形学实验作业</b>
-			</div>
-			<div id="div1">
-				<img src="/static/img/tx.png">
-				</a>
-				<h1>&nbsp;<a href="">太好了！是作业，我们完蛋了！</a>
-				</h1>
-				<p>&nbsp;作者：Zic</p>
-				<p>&nbsp;导演：小泽&nbsp;</p>
-				<p>&nbsp;时间：2024年9月2日－2024年12月17日</p>
-				<p>&nbsp;地区：中国&nbsp;&nbsp;语言：让我们说中文</p>
-				<p>&nbsp;主要负责人：Zicyoo</p>
-				<p>&nbsp;首播电视台：浙中医电视台</p>
-				<p>&nbsp;出品公司：zili</p>
-				<p>&nbsp;</p>
-				<div style="border: 2px aquamarine;">
-					<h2><span style="color: lightcoral;">作业介绍</span>
-						<hr>
-					</h2>&nbsp;&nbsp;
-					大风歌 刘邦
-					大风起兮云飞扬，威加海内兮归故乡。
-					安得猛士兮守四方！
-				</div>
-				<div style="border: 2px aquamarine;">
-					<h2><span style="color: lightcoral;">作业列表&nbsp;嘎嘎哒</span></h2>
-					<h3><span style="color: lightcoral;">
-							<ul style="list-style:none;padding-left: 12px;">
-								<a href="">
-									<li class="div3"></li>
-								</a>
-					</h3>
+        /* Course Info Styles */
+        .course-info {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 32px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-					<hr>
+        .course-info p {
+            margin: 12px 0;
+            color: #666;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
 
-					<div id="div3">
-						<ul style="list-style:none;padding-left: 12px;">
-							<a href="\web1\test\san1">
-								<li class="div3">1-1</li>
-							</a>
-							<a href="\web1\test\zheng1">
-								<li class="div3">1-2</li>
-							</a>
-							<a href="\web1\test\sanCo">
-								<li class="div3">1-3</li>
-							</a>
-							<a href="\web1\test\sanCo2">
-								<li class="div3">1-4</li>
-							</a>
-							<a href="\web1\test\szlx">
-								<li class="div3">1-5</li>
-							</a>
-							<a href="\web1\test\szlxCo">
-								<li class="div3">1-6</li>
-							</a>
-							<a href="\web2\work\gasketQuad">
-								<li class="div3">2-1</li>
-							</a>
-							<a href="\web2\work\quad3d">
-								<li class="div3">2-2</li>
-							</a>
-							<a href="\web2\work\Quadrilateral1">
-								<li class="div3">2-3</li>
-							</a>
-							<a href="\web2\work\Quadrilateral2col">
-								<li class="div3">2-4</li>
-							</a>
-							<a href="\web2\work\TriRotation">
-								<li class="div3">2-5</li>
-							</a>
-							<a href="\web3\html\draw">
-								<li class="div3">3-1</li>
-							</a>
-							<a href="\web3\html\xuan">
-								<li class="div3">3-2</li>
-							</a>
-							<a href="\web3\html\xuanzhuan">
-								<li class="div3">3-3</li>
-							</a>
-							<a href="\web4\task4\abc">
-								<li class="div3">4-1-1</li>
-							</a>
-							<a href="\web4\task4\d">
-								<li class="div3">4-1-2</li>
-							</a>
-							<a href="\web4\task4\e">
-								<li class="div3">4-1-3</li>
-							</a>
-							<a href="\web4-2\task4-2\abc4-2">
-								<li class="div3">4-2-1</li>
-							</a>
-							<a href="\web4-2\task4-2\d4-2">
-								<li class="div3">4-2-2</li>
-							</a>
-							<a href="\web4-2\task4\e4-2">
-								<li class="div3">4-2-3</li>
-							</a>
-							<a href="\web5\test\5-a">
-								<li class="div3">5-a</li>
-							</a>
-								<a href="\web5\test\5-b">
-								<li class="div3">5-b</li>
-							</a>
-							<a href="\web5\test\5-c">
-								<li class="div3">5-c</li>
-							</a>
-							<a href="\chap06\demos\6-a">
-								<li class="div3">6-a</li>
-							</a>
-							<a href="\chap06\demos\6-b">
-								<li class="div3">6-b</li>
-							</a>
-							<a href="\chap06\demos\6-c">
-								<li class="div3">6-c</li>
-							</a>
-							<a href="\chap07\demos\a">
-								<li class="div3">7-a</li>
-							</a>
-							<a href="\chap07-1\demos\a">
-								<li class="div3">7-1-a</li>
-							</a>
-							<a href="\chap07-1\demos\b">
-								<li class="div3">7-1-b</li>
-							</a>
-							<a href="">
-								<li class="div3">幻想星系</li>
-							</a>
-					</div>
+        .course-info p:hover {
+            color: #007AFF;
+        }
 
-				</div>
-					</div>
+        /* Section Styles */
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 60px 0 30px;
+            color: #1d1d1f;
+            text-align: center;
+        }
 
+        /* Assignment Grid Styles */
+        .assignment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
 
-				</div>
-			</div>
-	</body>
-</html>
+        .assignment-item {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 15px;
+            text-decoration: none;
+            color: #1d1d1f;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .assignment-item:hover {
+            background: #007AFF;
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+                        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Poetry Section */
+        .poetry {
+            text-align: center;
+            font-size: 20px;
+            line-height: 2;
+            color: #666;
+            margin: 40px auto;
+            max-width: 600px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .poetry br {
+            margin-bottom: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                font-size: 36px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .assignment-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 15px;
+            }
+
+            .course-info {
+                padding: 20px;
+            }
+
+            .poetry {
+                font-size: 18px;
+                padding: 30px 20px;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                color: #f5f5f7;
+            }
+
+            .course-info,
+            .poetry,
+            .assignment-item {
+                background: rgba(255, 255, 255, 0.1);
+                color: #f5f5f7;
+            }
+
+            .course-info p {
+                color: #999;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #f5f5f7 0%, #999 100%);
+                -webkit-background-clip: text;
+            }
+
+            .assignment-item:hover {
+                background: #0A84FF;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">计算机图形学</header>
+        
+        <main>
+            <img class="profile-image" src="/static/img/tx.png" alt="课程封面">
+            
+            <h1>Computer Graphics</h1>
+            
+            <section class="course-info">
+                <p>👨‍💻 作者：Zic</p>
+                <p>🎬 导演：小泽</p>
+                <p>📅 时间：2024年9月2日－2024年12月17日</p>
+                <p>🌏 地区：中国 · 让我们说中文</p>
+                <p>👑 主要负责人：Zicyoo</p>
+                <p>📺 首播电视台：浙中医电视台</p>
+                <p>🏢 出品公司：zili</p>
+            </section>
+
+            <section>
+                <h2 class="section-title">课程介绍</h2>
+                <div class="poetry">
+                    大风歌 · 刘邦<br>
+                    大风起兮云飞扬，威加海内兮归故乡。<br>
+                    安得猛士兮守四方！
+                </div>
+            </section>
+
+            <section>
+                <h2 class="section-title">实验作业</h2>
+                <div class="assignment-grid">
+                    <a href="/web1/test/san1" class="assignment-item">1-1</a>
+                    <a href="/web1/test/zheng1" class="assignment-item">1-2</a>
+                    <a href="/web1/test/sanCo" class="assignment-item">1-3</a>
+                    <a href="/web1/test/sanCo2" class="assignment-item">1-4</a>
+                    <a href="/web1/test/szlx" class="assignment-item">1-5</a>
+                    <a href="/web1/test/szlxCo" class="assignment-item">1-6</a>
+                    <a href="/web2/work/gasketQuad" class="assignment-item">2-1</a>
+                    <a href="/web2/work/quad3d" class="assignment-item">2-2</a>
+                    <a href="/web2/work/Quadrilateral1" class="assignment-item">2-3</a>
+                    <a href="/web2/work/Quadrilateral2col" class="assignment-item">2-4</a>
+                    <a href="/web2/work/TriRotation" class="assignment-item">2-5</a>
+                    <a href="/web3/html/draw" class="assignment-item">3-1</a>
+                    <a href="/web3/html/xuan" class="assignment-item">3-2</a>
+                    <a href="/web3/html/xuanzhuan" class="assignment-item">3-3</a>
+                    <a href="/web4/task4/abc" class="assignment-item">4-1-1</a>
+                    <a href="/web4/task4/d" class="assignment-item">4-1-2</a>
+                    <a href="/web4/task4/e" class="assignment-item">4-1-3</a>
+                    <a href="/web4-2/task4-2/abc4-2" class="assignment-item">4-2-1</a>
+                    <a href="/web4-2/task4-2/d4-2" class="assignment-item">4-2-2</a>
+                    <a href="/web4-2/task4/e4-2" class="assignment-item">4-2-3</a>
+                    <a href="/web5/test/5-a" class="assignment-item">5-a</a>
+                    <a href="/web5/test/5-b" class="assignment-item">5-b</a>
+                    <a href="/web5/test/5-c" class="assignment-item">5-c</a>
+                    <a href="/chap06/demos/6-a" class="assignment-item">6-a</a>
+                    <a href="/chap06/demos/6-b" class="assignment-item">6-b</a>
+                    <a href="/chap06/demos/6-c" class="assignment-item">6-c</a>
+                    <a href="/chap07/demos/a" class="assignment-item">7-a</a>
+                    <a href="/chap07-1/demos/a" class="assignment-item">7-1-a</a>
+                    <a href="/chap07-1/demos/b" class="assignment-item">7-1-b</a>
+                    <a href="#" class="assignment-item">幻想星系</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html> 
